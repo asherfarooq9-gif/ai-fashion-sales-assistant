@@ -124,7 +124,7 @@ export const mockProvider = {
     let result;
     if (task === 'intent') {
       const intent = classifyIntent(input);
-      result = { intent, confidence: 0.9, entities: { ...extractEntities(input), action: null } };
+      result = { intent, confidence: 0.9, entities: extractEntities(input) };
     } else if (task === 'sentiment') {
       result = classifySentiment(input);
     } else if (task === 'orderExtract') {
@@ -133,18 +133,17 @@ export const mockProvider = {
       const productName = nameMatch ? nameMatch[1] : e.category || null;
       const items = [];
       if (productName || e.color || e.size) {
-        items.push({
-          productName,
-          size: e.size || null,
-          color: e.color || null,
-          quantity: e.quantity || 1,
-        });
+        const item = { quantity: e.quantity || 1 };
+        if (productName) item.productName = productName;
+        if (e.size) item.size = e.size;
+        if (e.color) item.color = e.color;
+        items.push(item);
       }
       result = {
         items,
-        addressText: looksLikeAddress(input) ? input : null,
         confirm: /\b(confirm|yes|place (the )?order|go ahead|proceed)\b/i.test(input),
       };
+      if (looksLikeAddress(input)) result.addressText = input;
     } else {
       result = {};
     }

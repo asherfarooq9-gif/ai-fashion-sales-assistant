@@ -1,27 +1,25 @@
-import { ChatGoogleGenerativeAI, GoogleGenerativeAIEmbeddings } from '@langchain/google-genai';
+import { ChatGoogleGenerativeAI } from '@langchain/google-genai';
 import { config } from '../../config/env.js';
 import { logger } from '../../config/logger.js';
+import { mockProvider } from './mock.provider.js';
 
-let chatModel;
-let embedModel;
+const chatByTemp = new Map();
 
-function getChat(temperature = 0.4) {
+function modelFor(temperature = 0.4) {
   if (!config.GEMINI_API_KEY) throw new Error('GEMINI_API_KEY is not set');
-  chatModel ??= new ChatGoogleGenerativeAI({
-    apiKey: config.GEMINI_API_KEY,
-    model: config.GEMINI_CHAT_MODEL,
-    maxRetries: 2,
-  });
-  return chatModel.bind({ temperature });
-}
-
-function getEmbed() {
-  if (!config.GEMINI_API_KEY) throw new Error('GEMINI_API_KEY is not set');
-  embedModel ??= new GoogleGenerativeAIEmbeddings({
-    apiKey: config.GEMINI_API_KEY,
-    model: config.GEMINI_EMBED_MODEL,
-  });
-  return embedModel;
+  const key = String(temperature);
+  if (!chatByTemp.has(key)) {
+    chatByTemp.set(
+      key,
+      new ChatGoogleGenerativeAI({
+        apiKey: config.GEMINI_API_KEY,
+        model: config.GEMINI_CHAT_MODEL,
+        temperature,
+        maxRetries: 2,
+      })
+    );
+  }
+  return chatByTemp.get(key);
 }
 
 async function withBackoff(fn, tries = 3) {
@@ -45,27 +43,32 @@ export const geminiProvider = {
   name: 'gemini',
 
   async chat({ system, messages, temperature = 0.4 }) {
-    const model = getChat(temperature);
     const input = [];
     if (system) input.push({ role: 'system', content: system });
     input.push(...messages);
-    const res = await withBackoff(() => model.invoke(input));
+    const res = await withBackoff(() => modelFor(temperature).invoke(input));
     return {
-      text: typeof res.content === 'string' ? res.content : res.content.map((c) => c.text).join(''),
+      text:
+        typeof res.content === 'string'
+          ? res.content
+          : res.content.map((c) => c.text || '').join(''),
       usage: res.usage_metadata,
     };
   },
 
   async json({ system, prompt, schema }) {
-    const model = getChat(0).withStructuredOutput(schema);
+    const structured = modelFor(0).withStructuredOutput(schema);
     const input = [];
     if (system) input.push({ role: 'system', content: system });
     input.push({ role: 'user', content: prompt });
-    return withBackoff(() => model.invoke(input));
+    return withBackoff(() => structured.invoke(input));
   },
 
+  // Embeddings run through the deterministic local vectorizer so the stored
+  // product vectors (seeded at EMBEDDING_DIMS) always match query vectors.
+  // Swap in GoogleGenerativeAIEmbeddings + a reseed if you want live embeddings.
   async embed(texts) {
-    return withBackoff(() => getEmbed().embedDocuments(texts));
+    return mockProvider.embed(texts);
   },
 };
 

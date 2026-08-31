@@ -30,7 +30,7 @@ const schema = z.object({
   LLM_PROVIDER: z.enum(['mock', 'gemini', 'openrouter']).default(isTest ? 'mock' : 'mock'),
   LLM_FALLBACK_PROVIDER: z.enum(['mock', 'gemini', 'openrouter', 'none']).default('none'),
   GEMINI_API_KEY: z.string().optional().default(''),
-  GEMINI_CHAT_MODEL: z.string().default('gemini-2.0-flash'),
+  GEMINI_CHAT_MODEL: z.string().default('gemini-3.6-flash'),
   GEMINI_EMBED_MODEL: z.string().default('text-embedding-004'),
   OPENROUTER_API_KEY: z.string().optional().default(''),
   OPENROUTER_CHAT_MODEL: z.string().default('meta-llama/llama-3.3-70b-instruct:free'),

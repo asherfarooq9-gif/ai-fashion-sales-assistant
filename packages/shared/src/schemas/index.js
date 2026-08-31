@@ -129,15 +129,15 @@ export const intentResultSchema = z.object({
   confidence: z.number().min(0).max(1).default(0.5),
   entities: z
     .object({
-      category: z.string().nullish(),
-      gender: z.string().nullish(),
-      color: z.string().nullish(),
-      size: z.string().nullish(),
-      budget: z.number().nullish(),
-      productName: z.string().nullish(),
-      orderId: z.string().nullish(),
-      quantity: z.number().nullish(),
-      action: z.string().nullish(),
+      category: z.string().optional(),
+      gender: z.string().optional(),
+      color: z.string().optional(),
+      size: z.string().optional(),
+      budget: z.number().optional(),
+      productName: z.string().optional(),
+      orderId: z.string().optional(),
+      quantity: z.number().optional(),
+      action: z.string().optional(),
     })
     .default({}),
 });
@@ -151,14 +151,14 @@ export const orderExtractResultSchema = z.object({
   items: z
     .array(
       z.object({
-        productName: z.string().nullish(),
-        productId: z.string().nullish(),
-        size: z.string().nullish(),
-        color: z.string().nullish(),
+        productName: z.string().optional(),
+        productId: z.string().optional(),
+        size: z.string().optional(),
+        color: z.string().optional(),
         quantity: z.number().int().positive().default(1),
       })
     )
     .default([]),
-  addressText: z.string().nullish(),
+  addressText: z.string().optional(),
   confirm: z.boolean().default(false),
 });
