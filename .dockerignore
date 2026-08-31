@@ -8,6 +8,8 @@
 .github
 *.md
 !README.md
+!docs/openapi.yaml
 n8n
 infra
-docs
+docs/*
+!docs/openapi.yaml

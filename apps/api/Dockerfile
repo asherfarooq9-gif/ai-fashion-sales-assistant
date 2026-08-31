@@ -16,6 +16,7 @@ COPY package.json ./
 COPY packages/shared ./packages/shared
 COPY packages/eval ./packages/eval
 COPY apps/api ./apps/api
+COPY docs/openapi.yaml ./docs/openapi.yaml
 EXPOSE 5000
 HEALTHCHECK --interval=30s --timeout=5s --retries=3 \
   CMD node -e "fetch('http://localhost:5000/healthz').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"
