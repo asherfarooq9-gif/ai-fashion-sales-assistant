@@ -1,0 +1,13 @@
+**/node_modules
+**/dist
+**/build
+**/coverage
+**/.env
+**/.env.*
+.git
+.github
+*.md
+!README.md
+n8n
+infra
+docs

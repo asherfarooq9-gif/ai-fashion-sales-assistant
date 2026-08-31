@@ -1,0 +1,143 @@
+{
+  "name": "AI Fashion Sales Assistant",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "inbound",
+        "responseMode": "onReceived",
+        "options": {}
+      },
+      "id": "webhook-inbound",
+      "name": "Inbound Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [240, 300],
+      "webhookId": "afsa-inbound"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            { "id": "a1", "name": "apiBase", "value": "={{ $env.AFSA_API_BASE || 'http://api:5000' }}", "type": "string" },
+            { "id": "a2", "name": "internalToken", "value": "={{ $env.API_INTERNAL_TOKEN || 'change-me-internal' }}", "type": "string" },
+            { "id": "a3", "name": "channel", "value": "={{ $json.body.channel }}", "type": "string" },
+            { "id": "a4", "name": "payload", "value": "={{ $json.body.payload }}", "type": "object" }
+          ]
+        },
+        "options": {}
+      },
+      "id": "set-config",
+      "name": "Config",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [460, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Flatten the raw Meta payload into { channel, senderId, senderName, text }\nconst channel = $json.channel;\nconst raw = $json.payload || {};\nlet senderId = '', senderName, text = '';\nif (channel === 'instagram') {\n  const m = raw.entry?.[0]?.messaging?.[0];\n  senderId = m?.sender?.id || '';\n  text = m?.message?.text || '';\n} else if (channel === 'whatsapp') {\n  const v = raw.entry?.[0]?.changes?.[0]?.value || {};\n  const msg = v.messages?.[0] || {};\n  senderId = msg.from || v.contacts?.[0]?.wa_id || '';\n  senderName = v.contacts?.[0]?.profile?.name;\n  text = msg.text?.body || msg.interactive?.list_reply?.title || msg.button?.text || '';\n}\nreturn [{ json: { ...$json, senderId, senderName, text } }];"
+      },
+      "id": "normalize",
+      "name": "Normalize",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [680, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json.apiBase }}/api/chat/ingest",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [{ "name": "x-internal-token", "value": "={{ $json.internalToken }}" }]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ channel: $json.channel, senderId: $json.senderId, senderName: $json.senderName, text: $json.text, send: false }) }}",
+        "options": {}
+      },
+      "id": "run-pipeline",
+      "name": "Run AI Pipeline",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [900, 300]
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": { "caseSensitive": true, "version": 2 },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.data.intent }}",
+                    "rightValue": "complaint",
+                    "operator": { "type": "string", "operation": "equals" }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "outputKey": "complaint"
+            }
+          ]
+        },
+        "options": { "fallbackOutput": "extra" }
+      },
+      "id": "switch-intent",
+      "name": "Route by Intent",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3,
+      "position": [1120, 300]
+    },
+    {
+      "parameters": {
+        "content": "A complaint came in. Follow up with the customer.\nOrder/notes: {{ $json.data.reply }}",
+        "options": {}
+      },
+      "id": "notify-complaint",
+      "name": "Alert Support (complaint)",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [1340, 200]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Config').item.json.apiBase }}/api/channels/{{ $('Normalize').item.json.channel }}/send",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "x-internal-token", "value": "={{ $('Config').item.json.internalToken }}" }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ to: $('Normalize').item.json.senderId, text: $json.data.reply }) }}",
+        "options": {}
+      },
+      "id": "send-reply",
+      "name": "Send Reply",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1560, 300]
+    }
+  ],
+  "connections": {
+    "Inbound Webhook": { "main": [[{ "node": "Config", "type": "main", "index": 0 }]] },
+    "Config": { "main": [[{ "node": "Normalize", "type": "main", "index": 0 }]] },
+    "Normalize": { "main": [[{ "node": "Run AI Pipeline", "type": "main", "index": 0 }]] },
+    "Run AI Pipeline": { "main": [[{ "node": "Route by Intent", "type": "main", "index": 0 }]] },
+    "Route by Intent": {
+      "main": [
+        [{ "node": "Alert Support (complaint)", "type": "main", "index": 0 }],
+        [{ "node": "Send Reply", "type": "main", "index": 0 }]
+      ]
+    },
+    "Alert Support (complaint)": { "main": [[{ "node": "Send Reply", "type": "main", "index": 0 }]] }
+  },
+  "settings": { "executionOrder": "v1" },
+  "active": false,
+  "pinData": {},
+  "meta": { "templateId": "afsa-sales-assistant" }
+}

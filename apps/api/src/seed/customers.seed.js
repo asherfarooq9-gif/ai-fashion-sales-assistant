@@ -1,0 +1,67 @@
+export const customerSeed = [
+  {
+    name: 'Ayesha Khan',
+    phone: '923001234567',
+    whatsappId: '923001234567',
+    language: 'en',
+    address: { line1: 'House 12, Street 4', city: 'Lahore', country: 'Pakistan', raw: 'House 12, Street 4, Gulberg, Lahore' },
+    preferences: { gender: 'women', favoriteColor: 'maroon', budget: 6000, categories: ['dresses', 'lawn_suits'] },
+    orders: [{ productName: 'Black Embroidered Maxi', quantity: 1, size: 'M' }],
+  },
+  {
+    name: 'Bilal Ahmed',
+    phone: '923219876543',
+    whatsappId: '923219876543',
+    language: 'en',
+    address: { line1: 'Flat 7B', city: 'Karachi', country: 'Pakistan', raw: 'Flat 7B, DHA Phase 5, Karachi' },
+    preferences: { gender: 'men', favoriteColor: 'navy', budget: 5000, categories: ['shalwar_kameez', 'outerwear'] },
+    orders: [{ productName: 'Navy Shalwar Kameez', quantity: 2, size: 'L' }],
+  },
+  {
+    name: 'Fatima Noor',
+    instagramId: 'fatima.noor',
+    language: 'ur',
+    address: { line1: 'House 88', city: 'Islamabad', country: 'Pakistan', raw: 'House 88, F-11, Islamabad' },
+    preferences: { gender: 'women', favoriteColor: 'teal', budget: 8000, categories: ['dresses'] },
+    orders: [{ productName: 'Teal Anarkali Frock', quantity: 1, size: 'L' }],
+  },
+  {
+    name: 'Hamza Sheikh',
+    instagramId: 'hamza.sheikh',
+    language: 'en',
+    preferences: { gender: 'men', favoriteColor: 'black', budget: 4000, categories: ['bottoms', 'footwear'] },
+    orders: [],
+  },
+  {
+    name: 'Zara Malik',
+    phone: '923334445566',
+    whatsappId: '923334445566',
+    language: 'ur',
+    preferences: { gender: 'women', favoriteColor: 'pink', budget: 3500, categories: ['tops', 'kurtas'] },
+    orders: [],
+  },
+  {
+    name: 'Usman Tariq',
+    instagramId: 'usman.tariq',
+    language: 'en',
+    preferences: { gender: 'men', favoriteColor: 'olive', budget: 7000, categories: ['outerwear'] },
+    orders: [],
+  },
+  {
+    name: 'Mahnoor Ali',
+    phone: '923005558899',
+    whatsappId: '923005558899',
+    language: 'en',
+    preferences: { gender: 'women', favoriteColor: 'black', budget: 5000, categories: ['dresses', 'accessories'] },
+    orders: [],
+  },
+  {
+    name: 'Ali Raza',
+    instagramId: 'ali.raza',
+    language: 'en',
+    preferences: { gender: 'men', favoriteColor: 'white', budget: 3000, categories: ['tops'] },
+    orders: [],
+  },
+];
+
+export default customerSeed;

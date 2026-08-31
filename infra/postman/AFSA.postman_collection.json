@@ -1,0 +1,83 @@
+{
+  "info": {
+    "name": "AI Fashion Sales Assistant",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:5000" },
+    { "key": "internalToken", "value": "change-me-internal" },
+    { "key": "token", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "Health",
+      "request": { "method": "GET", "url": "{{baseUrl}}/healthz" }
+    },
+    {
+      "name": "Login",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": ["pm.collectionVariables.set('token', pm.response.json().token);"]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "url": "{{baseUrl}}/api/auth/login",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"admin@brand.test\",\n  \"password\": \"change-me-admin\"\n}"
+        }
+      }
+    },
+    {
+      "name": "List products (women, <= 5000)",
+      "request": { "method": "GET", "url": "{{baseUrl}}/api/products?gender=women&maxPrice=5000" }
+    },
+    {
+      "name": "Chat ingest",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "x-internal-token", "value": "{{internalToken}}" }
+        ],
+        "url": "{{baseUrl}}/api/chat/ingest",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"channel\": \"simulator\",\n  \"senderId\": \"postman-1\",\n  \"text\": \"I need a black dress for Eid under 6000\"\n}"
+        }
+      }
+    },
+    {
+      "name": "WhatsApp webhook verify",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/api/webhooks/whatsapp?hub.mode=subscribe&hub.verify_token=change-me-verify&hub.challenge=42"
+      }
+    },
+    {
+      "name": "WhatsApp webhook receive",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "url": "{{baseUrl}}/api/webhooks/whatsapp",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"entry\": [{ \"changes\": [{ \"value\": {\n    \"contacts\": [{ \"wa_id\": \"923001112233\", \"profile\": { \"name\": \"Sana\" } }],\n    \"messages\": [{ \"from\": \"923001112233\", \"type\": \"text\", \"text\": { \"body\": \"hi\" } }]\n  }}]}]\n}"
+        }
+      }
+    },
+    {
+      "name": "Export orders CSV",
+      "request": {
+        "method": "GET",
+        "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+        "url": "{{baseUrl}}/api/export/orders/csv"
+      }
+    }
+  ]
+}

@@ -1,0 +1,67 @@
+const img = (id) => `https://picsum.photos/seed/afsa${id}/600/800`;
+
+// name, category, price, gender, colors, sizes, tags, discount, rating, stock, salesCount
+const rows = [
+  ['Black Embroidered Maxi', 'dresses', 4999, 'women', ['black'], ['S', 'M', 'L', 'XL'], ['embroidered', 'formal', 'wedding', 'trending'], 10, 4.7, 24, 312],
+  ['Black Chiffon Dress', 'dresses', 5499, 'women', ['black'], ['S', 'M', 'L'], ['formal', 'party', 'trending'], 0, 4.5, 18, 205],
+  ['Ivory Cotton Kurta', 'kurtas', 1899, 'women', ['ivory', 'cream'], ['XS', 'S', 'M', 'L', 'XL'], ['casual', 'summer'], 0, 4.3, 60, 190],
+  ['Maroon Velvet Waistcoat', 'outerwear', 2999, 'men', ['maroon'], ['M', 'L', 'XL'], ['wedding', 'formal'], 5, 4.4, 15, 88],
+  ['Navy Shalwar Kameez', 'shalwar_kameez', 3499, 'men', ['navy'], ['M', 'L', 'XL', 'XXL'], ['formal', 'eid', 'trending'], 0, 4.6, 40, 260],
+  ['Peach Lawn 3-Piece Suit', 'lawn_suits', 4499, 'women', ['peach'], ['S', 'M', 'L'], ['summer', 'new_arrival'], 15, 4.5, 35, 140],
+  ['Olive Utility Jacket', 'outerwear', 5999, 'men', ['olive'], ['M', 'L', 'XL'], ['winter', 'casual'], 0, 4.2, 12, 54],
+  ['White Oversized Tee', 'tops', 1299, 'unisex', ['white'], ['S', 'M', 'L', 'XL'], ['casual', 'basics'], 0, 4.1, 120, 300],
+  ['Red Silk Formal Gown', 'dresses', 7999, 'women', ['red'], ['S', 'M', 'L'], ['formal', 'party', 'wedding'], 0, 4.8, 8, 60],
+  ['Beige Linen Trousers', 'bottoms', 2499, 'men', ['beige'], ['30', '32', '34', '36'], ['casual', 'summer'], 0, 4.0, 45, 95],
+  ['Teal Anarkali Frock', 'dresses', 6499, 'women', ['teal'], ['S', 'M', 'L', 'XL'], ['formal', 'eid'], 10, 4.6, 20, 130],
+  ['Grey Marl Hoodie', 'outerwear', 3299, 'unisex', ['grey'], ['S', 'M', 'L', 'XL'], ['winter', 'casual', 'trending'], 0, 4.4, 70, 240],
+  ['Mustard Cotton Kurti', 'kurtas', 1699, 'women', ['mustard'], ['S', 'M', 'L'], ['casual', 'summer'], 20, 4.2, 55, 175],
+  ['Black Slim Fit Jeans', 'bottoms', 2899, 'men', ['black'], ['30', '32', '34', '36', '38'], ['casual', 'basics', 'trending'], 0, 4.3, 90, 280],
+  ['Navy Blue Blazer', 'outerwear', 6999, 'men', ['navy'], ['M', 'L', 'XL'], ['formal', 'office'], 5, 4.5, 14, 70],
+  ['Pink Organza Dupatta', 'accessories', 1299, 'women', ['pink'], ['One Size'], ['wedding', 'formal'], 0, 4.1, 65, 110],
+  ['Tan Leather Khussa', 'footwear', 2199, 'women', ['tan', 'brown'], ['36', '37', '38', '39', '40'], ['traditional', 'wedding'], 0, 4.4, 30, 120],
+  ['Black Formal Oxford Shoes', 'footwear', 4999, 'men', ['black'], ['40', '41', '42', '43', '44'], ['formal', 'office'], 10, 4.5, 22, 96],
+  ['White Sneakers', 'footwear', 3499, 'unisex', ['white'], ['39', '40', '41', '42', '43', '44'], ['casual', 'trending'], 0, 4.3, 80, 265],
+  ["Women's Structured Handbag", 'accessories', 2999, 'women', ['black', 'beige'], ['One Size'], ['casual', 'office', 'trending'], 0, 4.2, 40, 150],
+  ['Black Clutch Bag', 'accessories', 1799, 'women', ['black'], ['One Size'], ['party', 'wedding'], 0, 4.0, 35, 80],
+  ['Cream Pashmina Shawl', 'accessories', 3999, 'women', ['cream'], ['One Size'], ['winter', 'formal'], 0, 4.6, 18, 62],
+  ['Blue Denim Jacket', 'outerwear', 3799, 'unisex', ['blue'], ['S', 'M', 'L', 'XL'], ['casual', 'winter'], 0, 4.3, 33, 128],
+  ['Green Printed Lawn Shirt', 'tops', 1599, 'women', ['green'], ['S', 'M', 'L', 'XL'], ['summer', 'casual', 'new_arrival'], 0, 4.1, 50, 90],
+  ['Charcoal Waistcoat', 'outerwear', 2799, 'men', ['grey'], ['M', 'L', 'XL'], ['formal', 'wedding'], 0, 4.2, 16, 44],
+  ['Red Bridal Lehenga', 'dresses', 24999, 'women', ['red', 'maroon'], ['S', 'M', 'L'], ['wedding', 'bridal', 'premium'], 0, 4.9, 4, 22],
+  ['Black Abaya', 'outerwear', 3499, 'women', ['black'], ['S', 'M', 'L', 'XL', 'XXL'], ['modest', 'everyday', 'trending'], 5, 4.5, 48, 210],
+  ['Beige Trench Coat', 'outerwear', 7499, 'women', ['beige'], ['S', 'M', 'L'], ['winter', 'formal'], 10, 4.4, 9, 30],
+  ['Navy Polo Shirt', 'tops', 1899, 'men', ['navy'], ['S', 'M', 'L', 'XL', 'XXL'], ['casual', 'basics'], 0, 4.2, 100, 220],
+  ['White Kurta Pajama', 'shalwar_kameez', 2999, 'men', ['white'], ['M', 'L', 'XL', 'XXL'], ['eid', 'traditional', 'trending'], 0, 4.6, 55, 275],
+  ['Olive Cargo Pants', 'bottoms', 2699, 'men', ['olive'], ['30', '32', '34', '36'], ['casual', 'street'], 0, 4.1, 42, 105],
+  ['Pink Floral Summer Dress', 'dresses', 3299, 'women', ['pink'], ['S', 'M', 'L'], ['summer', 'casual', 'new_arrival'], 15, 4.3, 38, 160],
+  ['Black Leather Belt', 'accessories', 999, 'men', ['black', 'brown'], ['One Size'], ['formal', 'basics'], 0, 4.0, 150, 260],
+  ['Maroon Silk Tie', 'accessories', 799, 'men', ['maroon'], ['One Size'], ['formal', 'office'], 0, 3.9, 90, 70],
+  ['Teal Block Heels', 'footwear', 3899, 'women', ['teal'], ['36', '37', '38', '39', '40'], ['party', 'formal'], 0, 4.2, 20, 58],
+  ['Grey Formal Trousers', 'bottoms', 2599, 'men', ['grey'], ['30', '32', '34', '36', '38'], ['formal', 'office'], 0, 4.1, 60, 112],
+  ['Cream Embroidered Sherwani', 'outerwear', 15999, 'men', ['cream'], ['M', 'L', 'XL'], ['wedding', 'premium', 'groom'], 0, 4.8, 5, 18],
+  ['Black Bodycon Dress', 'dresses', 3999, 'women', ['black'], ['XS', 'S', 'M', 'L'], ['party', 'trending'], 0, 4.4, 26, 185],
+  ['Navy Chinos', 'bottoms', 2799, 'men', ['navy'], ['30', '32', '34', '36'], ['casual', 'smart'], 10, 4.2, 48, 130],
+  ['Beige Kitten Heels', 'footwear', 3299, 'women', ['beige'], ['36', '37', '38', '39'], ['office', 'formal'], 0, 4.1, 24, 64],
+];
+
+export const productSeed = rows.map(
+  ([name, category, price, gender, colors, sizes, tags, discount, rating, stock, salesCount], i) => ({
+    name,
+    category,
+    price,
+    currency: 'PKR',
+    description: `${name}. ${tags.join(', ')}. ${gender} ${category.replace('_', ' ')}.`,
+    sizes,
+    colors,
+    stock,
+    images: [img(i), img(`${i}b`)],
+    discount,
+    rating,
+    gender,
+    tags,
+    salesCount,
+    isActive: true,
+  })
+);
+
+export default productSeed;

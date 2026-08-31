@@ -1,49 +1,82 @@
 # AI Fashion Sales Assistant
 
-AI-powered sales assistant for clothing brands. Auto-replies to Instagram DM and WhatsApp
-messages, understands customer queries, recommends products, and collects orders.
+An AI sales representative for clothing brands. It auto-replies to **Instagram DM** and
+**WhatsApp**, detects customer **intent** and **sentiment**, **recommends products**,
+**collects orders**, and ships with an **admin dashboard** and a **chat simulator** so the whole
+flow is demoable without Meta app review.
 
-## Objective
+> Runs fully offline with `LLM_PROVIDER=mock` — no API keys needed for development or CI.
 
-Behave like a professional sales representative for a clothing brand across messaging channels.
+## Stack
 
-## Features
+| Layer | Tech |
+|---|---|
+| Web | React + Vite + Tailwind CSS |
+| API | Node + Express (ESM), Mongoose |
+| DB | MongoDB (Atlas M0 in prod) |
+| AI | LangChain — Google Gemini free tier (`gemini-2.0-flash` + `text-embedding-004`), OpenRouter free model fallback, deterministic mock provider |
+| Orchestration | n8n (optional; API works standalone) |
+| Messaging | Instagram Graph API + WhatsApp Business (Cloud) API |
 
-- **Instagram DM automation** — auto-reply to greetings, price, availability, sizes, colors,
-  delivery, exchange, and order queries
-- **WhatsApp automation** — instant replies, catalog sharing, product recommendation, order
-  capture, address collection, order confirmation
-- **Intent detection** — greeting, product search, order placement, delivery inquiry,
-  complaint, return request, discount inquiry
-- **Sentiment analysis** — happy / angry / frustrated / interested buyer, with tailored responses
-- **Product recommendation engine** — by gender, budget, favorite color, category, purchase
-  history, and trending products
-- **Admin dashboard** — product CRUD, customers, orders, conversations, data export, AI training
+## Layout
 
-## Tech Stack
+```
+apps/api        Express API, AI pipeline, seed, tests
+apps/web        React admin dashboard + chat simulator
+packages/shared enums + zod schemas (used by api and web)
+packages/eval   the ~50 spec NL queries, used by intent tests
+n8n/            importable orchestration workflow
+infra/          Atlas vector index, Postman collection
+docs/           DATABASE, API, AI_WORKFLOW, DEPLOYMENT, DEMO, openapi.yaml
+```
 
-| Layer     | Technology                         |
-|-----------|------------------------------------|
-| Frontend  | React.js, Tailwind CSS             |
-| Backend   | Node.js, Express.js                |
-| Database  | MongoDB                            |
-| AI        | OpenAI API, LangChain              |
-| Automation| n8n                                |
-| Messaging | Instagram Graph API, WhatsApp Business API |
+## Quick start
 
-## Data Model
+```bash
+npm install
+cp .env.example .env                    # defaults work as-is (mock provider)
+docker compose up -d mongo              # or point MONGODB_URI at any mongo
+npm run seed                            # ~40 products, 8 customers, canned responses, admin
+npm run dev                             # api :5000, web :5173
+```
 
-- **Products** — name, category, price, description, sizes, colors, stock, images, discount, rating
-- **Customers** — name, phone, Instagram ID, address, order history, preferences
-- **Orders** — order ID, customer ID, products, quantity, status, payment status, tracking number
+Open http://localhost:5173, sign in with `ADMIN_EMAIL` / `ADMIN_PASSWORD` from `.env`, and open
+**Chat Simulator**. Follow [`docs/DEMO.md`](docs/DEMO.md).
 
-## Bonus
+To use the real free LLM instead of the mock:
 
-- Voice message support
-- Urdu + English language support
-- AI-generated sales replies
-- Auto upselling
+```bash
+# get a free key at https://aistudio.google.com/apikey
+LLM_PROVIDER=gemini GEMINI_API_KEY=... npm run dev
+```
 
-## Status
+## Scripts
 
-Early scaffolding.
+| command | what |
+|---|---|
+| `npm run dev` | api + web with reload |
+| `npm run seed` | seed the database (`-- --fresh` to drop first) |
+| `npm test` | all workspace tests (Vitest, mock provider) |
+| `npm run test:api` / `test:web` | one workspace |
+| `npm run lint` / `format` | eslint / prettier |
+| `npm run build` | production web build |
+| `docker compose up` | full stack: mongo + api + web + n8n |
+
+## Deliverables
+
+- [x] Complete source code (this monorepo)
+- [x] AI workflow — [`n8n/workflows/ai-fashion-sales-assistant.workflow.json`](n8n/workflows/ai-fashion-sales-assistant.workflow.json)
+- [x] Database design — [`docs/DATABASE.md`](docs/DATABASE.md)
+- [x] Admin dashboard — products CRUD, customers, orders, conversations, AI training, export
+- [x] Instagram DM integration — webhook verify/receive + Graph API send adapter
+- [x] WhatsApp integration — webhook verify/receive + Cloud API send adapter
+- [x] API documentation — [`docs/API.md`](docs/API.md) + `openapi.yaml` (served at `/api/docs`)
+- [x] Deployment guide — [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md)
+
+Bonus: voice-note handling (mock transcription), Urdu + English, AI-generated replies, auto-upsell.
+
+## Tests
+
+`npm test` runs Vitest across both workspaces with the deterministic mock provider and an
+in-memory MongoDB — no network, no keys. Coverage gate ≥ 80 % on the AI / conversation / LLM
+layer. CI: `.github/workflows/ci.yml`.

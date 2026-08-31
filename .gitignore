@@ -34,3 +34,8 @@ Thumbs.db
 *.local
 .cache/
 .turbo/
+*.tsbuildinfo
+.vercel
+.render
+/data
+n8n_data/

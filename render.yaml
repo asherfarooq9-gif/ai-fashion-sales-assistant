@@ -1,0 +1,57 @@
+services:
+  - type: web
+    name: afsa-api
+    runtime: docker
+    dockerfilePath: ./apps/api/Dockerfile
+    dockerContext: .
+    healthCheckPath: /healthz
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 5000
+      - key: MONGODB_URI
+        sync: false
+      - key: LLM_PROVIDER
+        value: gemini
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: LLM_FALLBACK_PROVIDER
+        value: openrouter
+      - key: OPENROUTER_API_KEY
+        sync: false
+      - key: JWT_SECRET
+        generateValue: true
+      - key: API_INTERNAL_TOKEN
+        generateValue: true
+      - key: ADMIN_EMAIL
+        sync: false
+      - key: ADMIN_PASSWORD
+        sync: false
+      - key: WEB_ORIGIN
+        sync: false
+      - key: ORCHESTRATION_MODE
+        value: direct
+      - key: CHANNEL_TRANSPORT
+        value: live
+
+  - type: web
+    name: afsa-n8n
+    runtime: image
+    image:
+      url: docker.io/n8nio/n8n:latest
+    envVars:
+      - key: N8N_BASIC_AUTH_ACTIVE
+        value: "true"
+      - key: N8N_BASIC_AUTH_USER
+        sync: false
+      - key: N8N_BASIC_AUTH_PASSWORD
+        sync: false
+      - key: WEBHOOK_URL
+        sync: false
+      - key: GENERIC_TIMEZONE
+        value: Asia/Karachi
+    disk:
+      name: n8n-data
+      mountPath: /home/node/.n8n
+      sizeGB: 1
