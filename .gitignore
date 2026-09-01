@@ -39,3 +39,9 @@ Thumbs.db
 .render
 /data
 n8n_data/
+
+# Secrets and local agent state
+atlas-credentials.env
+*-credentials.env
+.claude-flow/
+.claude/settings.local.json
